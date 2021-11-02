@@ -642,11 +642,17 @@ public class FlutterBluePlugin implements FlutterPlugin, ActivityAware, MethodCa
     public boolean onRequestPermissionsResult(
             int requestCode, String[] permissions, int[] grantResults) {
         if (requestCode == REQUEST_FINE_LOCATION_PERMISSIONS) {
-            if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+            // Caused by: java.lang.ArrayIndexOutOfBoundsException: 
+            //   at com.pauldemarco.flutter_blue.FlutterBluePlugin.onRequestPermissionsResult (FlutterBluePlugin.java:5)
+            if (grantResults != null && grantResults.length >= 1 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 startScan(pendingCall, pendingResult);
             } else {
-                pendingResult.error(
+                //Caused by: java.lang.NullPointerException: 
+                //   at com.pauldemarco.flutter_blue.FlutterBluePlugin.onRequestPermissionsResult (FlutterBluePlugin.java:24)
+                if(pendingResult != null){
+                    pendingResult.error(
                         "no_permissions", "flutter_blue plugin requires location permissions for scanning", null);
+                }
                 pendingResult = null;
                 pendingCall = null;
             }
