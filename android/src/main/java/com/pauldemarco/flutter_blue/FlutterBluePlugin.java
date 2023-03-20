@@ -785,8 +785,10 @@ public class FlutterBluePlugin implements FlutterPlugin, ActivityAware, MethodCa
                         if (macDeviceScanned.contains(result.getDevice().getAddress())) return;
                         macDeviceScanned.add(result.getDevice().getAddress());
                     }
-                    Protos.ScanResult scanResult = ProtoMaker.from(result.getDevice(), result);
-                    invokeMethodUIThread("ScanResult", scanResult.toByteArray());
+                    if(result != null && result.getDevice() != null){
+                        Protos.ScanResult scanResult = ProtoMaker.from(result.getDevice(), result);
+                        invokeMethodUIThread("ScanResult", scanResult.toByteArray());
+                    }
                 }
 
                 @Override
