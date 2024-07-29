@@ -771,11 +771,13 @@ public class FlutterBluePlugin implements FlutterPlugin, ActivityAware, MethodCa
         }
     }
 
-    private ScanCallback scanCallback21;
+    private  ScanCallback scanCallback21;
 
     @TargetApi(21)
     private ScanCallback getScanCallback21() {
         if(scanCallback21 == null){
+
+            try{
             scanCallback21 = new ScanCallback() {
 
                 @Override
@@ -802,6 +804,9 @@ public class FlutterBluePlugin implements FlutterPlugin, ActivityAware, MethodCa
                     super.onScanFailed(errorCode);
                 }
             };
+            }catch(Exception e){
+
+            }
         }
         return scanCallback21;
     }
