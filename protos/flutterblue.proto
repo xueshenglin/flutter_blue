@@ -2,213 +2,244 @@
 // All rights reserved. Use of this source code is governed by a
 // BSD-style license that can be found in the LICENSE file.
 
+// 详细使用说明请参考 protos/README.md
+
 syntax = "proto3";
 
-option java_package = "com.pauldemarco.flutter_blue";
-option java_outer_classname = "Protos";
-option objc_class_prefix = "Protos";
+// 定义 Java 相关配置
+option java_package = "com.pauldemarco.flutter_blue";  // Java 代码的包名
+option java_outer_classname = "Protos";                // 生成的 Java 外部类名
+option objc_class_prefix = "Protos";                   // Objective-C 类名前缀
 
-// Wrapper message for `int32`.
-//
-// Allows for nullability of fields in messages
+// Int32Value 消息用于包装 int32 类型，使其可为空
 message Int32Value {
-  // The int32 value.
-  int32 value = 1;
+    // int32 类型的值
+    int32 value = 1;
 }
 
+// 蓝牙状态消息，表示蓝牙适配器的当前状态
 message BluetoothState {
-  enum State {
-    UNKNOWN = 0;
-    UNAVAILABLE = 1;
-    UNAUTHORIZED = 2;
-    TURNING_ON = 3;
-    ON = 4;
-    TURNING_OFF = 5;
-    OFF = 6;
-  };
-  State state = 1;
+    // 蓝牙状态枚举
+    enum State {
+        UNKNOWN = 0;      // 未知状态
+        UNAVAILABLE = 1;  // 不可用（设备不支持蓝牙）
+        UNAUTHORIZED = 2; // 未授权（没有蓝牙权限）
+        TURNING_ON = 3;   // 正在打开
+        ON = 4;          // 已打开
+        TURNING_OFF = 5;  // 正在关闭
+        OFF = 6;         // 已关闭
+    };
+    State state = 1;     // 当前状态
 }
 
+// 广播数据消息，包含设备广播的各种信息
 message AdvertisementData {
-  string local_name = 1;
-  Int32Value tx_power_level = 2;
-  bool connectable = 3;
-  map<int32, bytes> manufacturer_data = 4; // Map of manufacturers to their data
-  map<string, bytes> service_data = 5;  // Map of service UUIDs to their data.
-  repeated string service_uuids = 6;
+    string local_name = 1;                         // 设备本地名称
+    Int32Value tx_power_level = 2;                // 发射功率水平
+    bool connectable = 3;                         // 是否可连接
+    map<int32, bytes> manufacturer_data = 4;      // 制造商数据，key 为制造商 ID
+    map<string, bytes> service_data = 5;          // 服务数据，key 为服务 UUID
+    repeated string service_uuids = 6;            // 服务 UUID 列表
 }
 
+// 扫描设置消息，配置蓝牙扫描参数
 message ScanSettings {
-  int32 android_scan_mode = 1;
-  repeated string service_uuids = 2;
-  bool allow_duplicates = 3;
+    int32 android_scan_mode = 1;                  // Android 扫描模式
+    repeated string service_uuids = 2;            // 要扫描的服务 UUID 列表
+    bool allow_duplicates = 3;                    // 是否允许重复结果
 }
 
+// 扫描结果消息，包含发现的设备信息
 message ScanResult {
-  BluetoothDevice device = 1;  // The received peer's ID.
-  AdvertisementData advertisement_data = 2;
-  int32 rssi = 3;
+    BluetoothDevice device = 1;                   // 发现的蓝牙设备
+    AdvertisementData advertisement_data = 2;     // 设备的广播数据
+    int32 rssi = 3;                              // 信号强度（RSSI）
 }
 
+// 连接请求消息
 message ConnectRequest {
-  string remote_id = 1;
-  bool android_auto_connect = 2;
+    string remote_id = 1;                         // 远程设备 ID
+    bool android_auto_connect = 2;                // Android 是否自动重连
 }
 
+// 蓝牙设备消息，描述一个蓝牙设备的基本信息
 message BluetoothDevice {
-  enum Type {
-    UNKNOWN = 0;
-    CLASSIC = 1;
-    LE = 2;
-    DUAL = 3;
-  };
+    // 设备类型枚举
+    enum Type {
+        UNKNOWN = 0;    // 未知类型
+        CLASSIC = 1;    // 经典蓝牙
+        LE = 2;         // 低功耗蓝牙（BLE）
+        DUAL = 3;       // 双模蓝牙
+    };
 
-  string remote_id = 1;
-  string name = 2;
-  Type type = 3;
+    string remote_id = 1;                         // 远程设备 ID
+    string name = 2;                             // 设备名称
+    Type type = 3;                               // 设备类型
 }
 
+// 蓝牙服务消息，描述设备提供的服务
 message BluetoothService {
-  string uuid = 1;
-  string remote_id = 2;
-  bool is_primary = 3; // Indicates whether the type of service is primary or secondary.
-  repeated BluetoothCharacteristic characteristics = 4; // A list of characteristics that have been discovered in this service.
-  repeated BluetoothService included_services = 5; // A list of included services that have been discovered in this service.
+    string uuid = 1;                             // 服务 UUID
+    string remote_id = 2;                        // 远程设备 ID
+    bool is_primary = 3;                         // 是否为主服务
+    repeated BluetoothCharacteristic characteristics = 4;    // 特征值列表
+    repeated BluetoothService included_services = 5;         // 包含的子服务列表
 }
 
+// 蓝牙特征值消息，描述服务的特征值
 message BluetoothCharacteristic {
-  string uuid = 1;
-  string remote_id = 2;
-  string serviceUuid = 3; // The service that this characteristic belongs to.
-  string secondaryServiceUuid = 4; // The secondary service if nested
-  repeated BluetoothDescriptor descriptors = 5; // A list of descriptors that have been discovered in this characteristic.
-  CharacteristicProperties properties = 6; // The properties of the characteristic.
-  bytes value = 7;
+    string uuid = 1;                             // 特征值 UUID
+    string remote_id = 2;                        // 远程设备 ID
+    string serviceUuid = 3;                      // 所属服务的 UUID
+    string secondaryServiceUuid = 4;             // 次级服务 UUID（如果有）
+    repeated BluetoothDescriptor descriptors = 5; // 描述符列表
+    CharacteristicProperties properties = 6;      // 特征值属性
+    bytes value = 7;                             // 特征值数据
 }
 
+// 蓝牙描述符消息，描述特征值的额外信息
 message BluetoothDescriptor {
-  string uuid = 1;
-  string remote_id = 2;
-  string serviceUuid = 3; // The service that this descriptor belongs to.
-  string characteristicUuid = 4; // The characteristic that this descriptor belongs to.
-  bytes value = 5;
+    string uuid = 1;                             // 描述符 UUID
+    string remote_id = 2;                        // 远程设备 ID
+    string serviceUuid = 3;                      // 所属服务的 UUID
+    string characteristicUuid = 4;               // 所属特征值的 UUID
+    bytes value = 5;                             // 描述符值
 }
 
+// 特征值属性消息，描述特征值支持的操作
 message CharacteristicProperties {
-  bool broadcast = 1;
-  bool read = 2;
-  bool write_without_response = 3;
-  bool write = 4;
-  bool notify = 5;
-  bool indicate = 6;
-  bool authenticated_signed_writes = 7;
-  bool extended_properties = 8;
-  bool notify_encryption_required = 9;
-  bool indicate_encryption_required = 10;
+    bool broadcast = 1;                          // 是否支持广播
+    bool read = 2;                              // 是否支持读取
+    bool write_without_response = 3;             // 是否支持无响应写入
+    bool write = 4;                             // 是否支持写入
+    bool notify = 5;                            // 是否支持通知
+    bool indicate = 6;                          // 是否支持指示
+    bool authenticated_signed_writes = 7;        // 是否支持认证签名写入
+    bool extended_properties = 8;                // 是否有扩展属性
+    bool notify_encryption_required = 9;         // 通知是否需要加密
+    bool indicate_encryption_required = 10;      // 指示是否需要加密
 }
 
+// 服务发现结果消息
 message DiscoverServicesResult {
-  string remote_id = 1;
-  repeated BluetoothService services = 2;
+    string remote_id = 1;                        // 远程设备 ID
+    repeated BluetoothService services = 2;      // 发现的服务列表
 }
 
+// 读取特征值请求消息
 message ReadCharacteristicRequest {
-  string remote_id = 1;
-  string characteristic_uuid = 2;
-  string service_uuid = 3;
-  string secondary_service_uuid = 4;
+    string remote_id = 1;                        // 远程设备 ID
+    string characteristic_uuid = 2;              // 特征值 UUID
+    string service_uuid = 3;                    // 服务 UUID
+    string secondary_service_uuid = 4;           // 次级服务 UUID
 }
 
+// 读取特征值响应消息
 message ReadCharacteristicResponse {
-  string remote_id = 1;
-  BluetoothCharacteristic characteristic = 2;
+    string remote_id = 1;                        // 远程设备 ID
+    BluetoothCharacteristic characteristic = 2;  // 读取的特征值
 }
 
+// 读取描述符请求消息
 message ReadDescriptorRequest {
-  string remote_id = 1;
-  string descriptor_uuid = 2;
-  string service_uuid = 3;
-  string secondary_service_uuid = 4;
-  string characteristic_uuid = 5;
+    string remote_id = 1;                        // 远程设备 ID
+    string descriptor_uuid = 2;                  // 描述符 UUID
+    string service_uuid = 3;                    // 服务 UUID
+    string secondary_service_uuid = 4;           // 次级服务 UUID
+    string characteristic_uuid = 5;              // 特征值 UUID
 }
 
+// 读取描述符响应消息
 message ReadDescriptorResponse {
-  ReadDescriptorRequest request = 1;
-  bytes value = 2;
+    ReadDescriptorRequest request = 1;           // 原始请求
+    bytes value = 2;                            // 读取的值
 }
 
+// 写入特征值请求消息
 message WriteCharacteristicRequest {
-  enum WriteType {
-    WITH_RESPONSE = 0;
-    WITHOUT_RESPONSE = 1;
-  }
-  string remote_id = 1;
-  string characteristic_uuid = 2;
-  string service_uuid = 3;
-  string secondary_service_uuid = 4;
-  WriteType write_type = 5;
-  bytes value = 6;
+    // 写入类型枚举
+    enum WriteType {
+        WITH_RESPONSE = 0;      // 需要响应
+        WITHOUT_RESPONSE = 1;   // 无需响应
+    }
+    string remote_id = 1;                        // 远程设备 ID
+    string characteristic_uuid = 2;              // 特征值 UUID
+    string service_uuid = 3;                    // 服务 UUID
+    string secondary_service_uuid = 4;           // 次级服务 UUID
+    WriteType write_type = 5;                   // 写入类型
+    bytes value = 6;                            // 要写入的值
 }
 
+// 写入特征值响应消息
 message WriteCharacteristicResponse {
-  WriteCharacteristicRequest request = 1;
-  bool success = 2;
+    WriteCharacteristicRequest request = 1;      // 原始请求
+    bool success = 2;                           // 是否成功
 }
 
+// 写入描述符请求消息
 message WriteDescriptorRequest {
-  string remote_id = 1;
-  string descriptor_uuid = 2;
-  string service_uuid = 3;
-  string secondary_service_uuid = 4;
-  string characteristic_uuid = 5;
-  bytes value = 6;
+    string remote_id = 1;                        // 远程设备 ID
+    string descriptor_uuid = 2;                  // 描述符 UUID
+    string service_uuid = 3;                    // 服务 UUID
+    string secondary_service_uuid = 4;           // 次级服务 UUID
+    string characteristic_uuid = 5;              // 特征值 UUID
+    bytes value = 6;                            // 要写入的值
 }
 
+// 写入描述符响应消息
 message WriteDescriptorResponse {
-  WriteDescriptorRequest request = 1;
-  bool success = 2;
+    WriteDescriptorRequest request = 1;          // 原始请求
+    bool success = 2;                           // 是否成功
 }
 
+// 设置通知请求消息
 message SetNotificationRequest {
-  string remote_id = 1;
-  string service_uuid = 2;
-  string secondary_service_uuid = 3;
-  string characteristic_uuid = 4;
-  bool enable = 5;
+    string remote_id = 1;                        // 远程设备 ID
+    string service_uuid = 2;                    // 服务 UUID
+    string secondary_service_uuid = 3;           // 次级服务 UUID
+    string characteristic_uuid = 4;              // 特征值 UUID
+    bool enable = 5;                            // 是否启用通知
 }
 
+// 设置通知响应消息
 message SetNotificationResponse {
-  string remote_id = 1;
-  BluetoothCharacteristic characteristic = 2;
-  bool success = 3;
+    string remote_id = 1;                        // 远程设备 ID
+    BluetoothCharacteristic characteristic = 2;  // 相关特征值
+    bool success = 3;                           // 是否成功
 }
 
+// 特征值变化通知消息
 message OnCharacteristicChanged {
-  string remote_id = 1;
-  BluetoothCharacteristic characteristic = 2;
+    string remote_id = 1;                        // 远程设备 ID
+    BluetoothCharacteristic characteristic = 2;  // 发生变化的特征值
 }
 
+// 设备状态响应消息
 message DeviceStateResponse {
-  enum BluetoothDeviceState {
-    DISCONNECTED = 0;
-    CONNECTING = 1;
-    CONNECTED = 2;
-    DISCONNECTING = 3;
-  }
-  string remote_id = 1;
-  BluetoothDeviceState state = 2;
+    // 设备状态枚举
+    enum BluetoothDeviceState {
+        DISCONNECTED = 0;   // 已断开连接
+        CONNECTING = 1;     // 正在连接
+        CONNECTED = 2;      // 已连接
+        DISCONNECTING = 3;  // 正在断开连接
+    }
+    string remote_id = 1;                        // 远程设备 ID
+    BluetoothDeviceState state = 2;             // 设备状态
 }
 
+// 已连接设备响应消息
 message ConnectedDevicesResponse {
-  repeated BluetoothDevice devices = 1;
+    repeated BluetoothDevice devices = 1;        // 已连接的设备列表
 }
 
+// MTU 大小请求消息
 message MtuSizeRequest {
-  string remote_id = 1;
-  uint32 mtu = 2;
+    string remote_id = 1;                        // 远程设备 ID
+    uint32 mtu = 2;                             // MTU 大小
 }
 
+// MTU 大小响应消息
 message MtuSizeResponse {
-  string remote_id = 1;
-  uint32 mtu = 2;
+    string remote_id = 1;                        // 远程设备 ID
+    uint32 mtu = 2;                             // 协商后的 MTU 大小
 }
