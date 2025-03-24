@@ -21,7 +21,9 @@ protoc --java_out=lite:../android/src/generated/source/proto/release/java \
        flutterblue.proto
 
 echo "Generating Objective-C code..."
-protoc --objc_out=../ios/Classes \
+# 使用指定版本的 protoc 程序 (protoc 3.11.4)
+# 注意：这个版本需要与 iOS 项目中的 Protobuf 库版本匹配
+./protoc-3.11.4-osx-x86_64/bin/protoc --objc_out=../ios/gen \
        --proto_path=. \
        flutterblue.proto
 

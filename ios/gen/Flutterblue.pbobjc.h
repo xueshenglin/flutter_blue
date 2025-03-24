@@ -42,6 +42,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 #pragma mark - Enum ProtosBluetoothState_State
 
+/** 蓝牙状态枚举 */
 typedef GPB_ENUM(ProtosBluetoothState_State) {
   /**
    * Value used if any message's field encounters a value that is not defined
@@ -49,12 +50,25 @@ typedef GPB_ENUM(ProtosBluetoothState_State) {
    * of the field.
    **/
   ProtosBluetoothState_State_GPBUnrecognizedEnumeratorValue = kGPBUnrecognizedEnumeratorValue,
+  /** 未知状态 */
   ProtosBluetoothState_State_Unknown = 0,
+
+  /** 不可用（设备不支持蓝牙） */
   ProtosBluetoothState_State_Unavailable = 1,
+
+  /** 未授权（没有蓝牙权限） */
   ProtosBluetoothState_State_Unauthorized = 2,
+
+  /** 正在打开 */
   ProtosBluetoothState_State_TurningOn = 3,
+
+  /** 已打开 */
   ProtosBluetoothState_State_On = 4,
+
+  /** 正在关闭 */
   ProtosBluetoothState_State_TurningOff = 5,
+
+  /** 已关闭 */
   ProtosBluetoothState_State_Off = 6,
 };
 
@@ -68,6 +82,7 @@ BOOL ProtosBluetoothState_State_IsValidValue(int32_t value);
 
 #pragma mark - Enum ProtosBluetoothDevice_Type
 
+/** 设备类型枚举 */
 typedef GPB_ENUM(ProtosBluetoothDevice_Type) {
   /**
    * Value used if any message's field encounters a value that is not defined
@@ -75,9 +90,16 @@ typedef GPB_ENUM(ProtosBluetoothDevice_Type) {
    * of the field.
    **/
   ProtosBluetoothDevice_Type_GPBUnrecognizedEnumeratorValue = kGPBUnrecognizedEnumeratorValue,
+  /** 未知类型 */
   ProtosBluetoothDevice_Type_Unknown = 0,
+
+  /** 经典蓝牙 */
   ProtosBluetoothDevice_Type_Classic = 1,
+
+  /** 低功耗蓝牙（BLE） */
   ProtosBluetoothDevice_Type_Le = 2,
+
+  /** 双模蓝牙 */
   ProtosBluetoothDevice_Type_Dual = 3,
 };
 
@@ -91,6 +113,7 @@ BOOL ProtosBluetoothDevice_Type_IsValidValue(int32_t value);
 
 #pragma mark - Enum ProtosWriteCharacteristicRequest_WriteType
 
+/** 写入类型枚举 */
 typedef GPB_ENUM(ProtosWriteCharacteristicRequest_WriteType) {
   /**
    * Value used if any message's field encounters a value that is not defined
@@ -98,7 +121,10 @@ typedef GPB_ENUM(ProtosWriteCharacteristicRequest_WriteType) {
    * of the field.
    **/
   ProtosWriteCharacteristicRequest_WriteType_GPBUnrecognizedEnumeratorValue = kGPBUnrecognizedEnumeratorValue,
+  /** 需要响应 */
   ProtosWriteCharacteristicRequest_WriteType_WithResponse = 0,
+
+  /** 无需响应 */
   ProtosWriteCharacteristicRequest_WriteType_WithoutResponse = 1,
 };
 
@@ -112,6 +138,7 @@ BOOL ProtosWriteCharacteristicRequest_WriteType_IsValidValue(int32_t value);
 
 #pragma mark - Enum ProtosDeviceStateResponse_BluetoothDeviceState
 
+/** 设备状态枚举 */
 typedef GPB_ENUM(ProtosDeviceStateResponse_BluetoothDeviceState) {
   /**
    * Value used if any message's field encounters a value that is not defined
@@ -119,9 +146,16 @@ typedef GPB_ENUM(ProtosDeviceStateResponse_BluetoothDeviceState) {
    * of the field.
    **/
   ProtosDeviceStateResponse_BluetoothDeviceState_GPBUnrecognizedEnumeratorValue = kGPBUnrecognizedEnumeratorValue,
+  /** 已断开连接 */
   ProtosDeviceStateResponse_BluetoothDeviceState_Disconnected = 0,
+
+  /** 正在连接 */
   ProtosDeviceStateResponse_BluetoothDeviceState_Connecting = 1,
+
+  /** 已连接 */
   ProtosDeviceStateResponse_BluetoothDeviceState_Connected = 2,
+
+  /** 正在断开连接 */
   ProtosDeviceStateResponse_BluetoothDeviceState_Disconnecting = 3,
 };
 
@@ -155,13 +189,11 @@ typedef GPB_ENUM(ProtosInt32Value_FieldNumber) {
 };
 
 /**
- * Wrapper message for `int32`.
- *
- * Allows for nullability of fields in messages
+ * Int32Value 消息用于包装 int32 类型，使其可为空
  **/
 @interface ProtosInt32Value : GPBMessage
 
-/** The int32 value. */
+/** int32 类型的值 */
 @property(nonatomic, readwrite) int32_t value;
 
 @end
@@ -172,8 +204,12 @@ typedef GPB_ENUM(ProtosBluetoothState_FieldNumber) {
   ProtosBluetoothState_FieldNumber_State = 1,
 };
 
+/**
+ * 蓝牙状态消息，表示蓝牙适配器的当前状态
+ **/
 @interface ProtosBluetoothState : GPBMessage
 
+/** 当前状态 */
 @property(nonatomic, readwrite) ProtosBluetoothState_State state;
 
 @end
@@ -201,26 +237,33 @@ typedef GPB_ENUM(ProtosAdvertisementData_FieldNumber) {
   ProtosAdvertisementData_FieldNumber_ServiceUuidsArray = 6,
 };
 
+/**
+ * 广播数据消息，包含设备广播的各种信息
+ **/
 @interface ProtosAdvertisementData : GPBMessage
 
+/** 设备本地名称 */
 @property(nonatomic, readwrite, copy, null_resettable) NSString *localName;
 
+/** 发射功率水平 */
 @property(nonatomic, readwrite, strong, null_resettable) ProtosInt32Value *txPowerLevel;
 /** Test to see if @c txPowerLevel has been set. */
 @property(nonatomic, readwrite) BOOL hasTxPowerLevel;
 
+/** 是否可连接 */
 @property(nonatomic, readwrite) BOOL connectable;
 
-/** Map of manufacturers to their data */
+/** 制造商数据，key 为制造商 ID */
 @property(nonatomic, readwrite, strong, null_resettable) GPBInt32ObjectDictionary<NSData*> *manufacturerData;
 /** The number of items in @c manufacturerData without causing the array to be created. */
 @property(nonatomic, readonly) NSUInteger manufacturerData_Count;
 
-/** Map of service UUIDs to their data. */
+/** 服务数据，key 为服务 UUID */
 @property(nonatomic, readwrite, strong, null_resettable) NSMutableDictionary<NSString*, NSData*> *serviceData;
 /** The number of items in @c serviceData without causing the array to be created. */
 @property(nonatomic, readonly) NSUInteger serviceData_Count;
 
+/** 服务 UUID 列表 */
 @property(nonatomic, readwrite, strong, null_resettable) NSMutableArray<NSString*> *serviceUuidsArray;
 /** The number of items in @c serviceUuidsArray without causing the array to be created. */
 @property(nonatomic, readonly) NSUInteger serviceUuidsArray_Count;
@@ -235,14 +278,20 @@ typedef GPB_ENUM(ProtosScanSettings_FieldNumber) {
   ProtosScanSettings_FieldNumber_AllowDuplicates = 3,
 };
 
+/**
+ * 扫描设置消息，配置蓝牙扫描参数
+ **/
 @interface ProtosScanSettings : GPBMessage
 
+/** Android 扫描模式 */
 @property(nonatomic, readwrite) int32_t androidScanMode;
 
+/** 要扫描的服务 UUID 列表 */
 @property(nonatomic, readwrite, strong, null_resettable) NSMutableArray<NSString*> *serviceUuidsArray;
 /** The number of items in @c serviceUuidsArray without causing the array to be created. */
 @property(nonatomic, readonly) NSUInteger serviceUuidsArray_Count;
 
+/** 是否允许重复结果 */
 @property(nonatomic, readwrite) BOOL allowDuplicates;
 
 @end
@@ -255,17 +304,22 @@ typedef GPB_ENUM(ProtosScanResult_FieldNumber) {
   ProtosScanResult_FieldNumber_Rssi = 3,
 };
 
+/**
+ * 扫描结果消息，包含发现的设备信息
+ **/
 @interface ProtosScanResult : GPBMessage
 
-/** The received peer's ID. */
+/** 发现的蓝牙设备 */
 @property(nonatomic, readwrite, strong, null_resettable) ProtosBluetoothDevice *device;
 /** Test to see if @c device has been set. */
 @property(nonatomic, readwrite) BOOL hasDevice;
 
+/** 设备的广播数据 */
 @property(nonatomic, readwrite, strong, null_resettable) ProtosAdvertisementData *advertisementData;
 /** Test to see if @c advertisementData has been set. */
 @property(nonatomic, readwrite) BOOL hasAdvertisementData;
 
+/** 信号强度（RSSI） */
 @property(nonatomic, readwrite) int32_t rssi;
 
 @end
@@ -277,10 +331,15 @@ typedef GPB_ENUM(ProtosConnectRequest_FieldNumber) {
   ProtosConnectRequest_FieldNumber_AndroidAutoConnect = 2,
 };
 
+/**
+ * 连接请求消息
+ **/
 @interface ProtosConnectRequest : GPBMessage
 
+/** 远程设备 ID */
 @property(nonatomic, readwrite, copy, null_resettable) NSString *remoteId;
 
+/** Android 是否自动重连 */
 @property(nonatomic, readwrite) BOOL androidAutoConnect;
 
 @end
@@ -293,12 +352,18 @@ typedef GPB_ENUM(ProtosBluetoothDevice_FieldNumber) {
   ProtosBluetoothDevice_FieldNumber_Type = 3,
 };
 
+/**
+ * 蓝牙设备消息，描述一个蓝牙设备的基本信息
+ **/
 @interface ProtosBluetoothDevice : GPBMessage
 
+/** 远程设备 ID */
 @property(nonatomic, readwrite, copy, null_resettable) NSString *remoteId;
 
+/** 设备名称 */
 @property(nonatomic, readwrite, copy, null_resettable) NSString *name;
 
+/** 设备类型 */
 @property(nonatomic, readwrite) ProtosBluetoothDevice_Type type;
 
 @end
@@ -325,21 +390,26 @@ typedef GPB_ENUM(ProtosBluetoothService_FieldNumber) {
   ProtosBluetoothService_FieldNumber_IncludedServicesArray = 5,
 };
 
+/**
+ * 蓝牙服务消息，描述设备提供的服务
+ **/
 @interface ProtosBluetoothService : GPBMessage
 
+/** 服务 UUID */
 @property(nonatomic, readwrite, copy, null_resettable) NSString *uuid;
 
+/** 远程设备 ID */
 @property(nonatomic, readwrite, copy, null_resettable) NSString *remoteId;
 
-/** Indicates whether the type of service is primary or secondary. */
+/** 是否为主服务 */
 @property(nonatomic, readwrite) BOOL isPrimary;
 
-/** A list of characteristics that have been discovered in this service. */
+/** 特征值列表 */
 @property(nonatomic, readwrite, strong, null_resettable) NSMutableArray<ProtosBluetoothCharacteristic*> *characteristicsArray;
 /** The number of items in @c characteristicsArray without causing the array to be created. */
 @property(nonatomic, readonly) NSUInteger characteristicsArray_Count;
 
-/** A list of included services that have been discovered in this service. */
+/** 包含的子服务列表 */
 @property(nonatomic, readwrite, strong, null_resettable) NSMutableArray<ProtosBluetoothService*> *includedServicesArray;
 /** The number of items in @c includedServicesArray without causing the array to be created. */
 @property(nonatomic, readonly) NSUInteger includedServicesArray_Count;
@@ -358,28 +428,34 @@ typedef GPB_ENUM(ProtosBluetoothCharacteristic_FieldNumber) {
   ProtosBluetoothCharacteristic_FieldNumber_Value = 7,
 };
 
+/**
+ * 蓝牙特征值消息，描述服务的特征值
+ **/
 @interface ProtosBluetoothCharacteristic : GPBMessage
 
+/** 特征值 UUID */
 @property(nonatomic, readwrite, copy, null_resettable) NSString *uuid;
 
+/** 远程设备 ID */
 @property(nonatomic, readwrite, copy, null_resettable) NSString *remoteId;
 
-/** The service that this characteristic belongs to. */
+/** 所属服务的 UUID */
 @property(nonatomic, readwrite, copy, null_resettable) NSString *serviceUuid;
 
-/** The secondary service if nested */
+/** 次级服务 UUID（如果有） */
 @property(nonatomic, readwrite, copy, null_resettable) NSString *secondaryServiceUuid;
 
-/** A list of descriptors that have been discovered in this characteristic. */
+/** 描述符列表 */
 @property(nonatomic, readwrite, strong, null_resettable) NSMutableArray<ProtosBluetoothDescriptor*> *descriptorsArray;
 /** The number of items in @c descriptorsArray without causing the array to be created. */
 @property(nonatomic, readonly) NSUInteger descriptorsArray_Count;
 
-/** The properties of the characteristic. */
+/** 特征值属性 */
 @property(nonatomic, readwrite, strong, null_resettable) ProtosCharacteristicProperties *properties;
 /** Test to see if @c properties has been set. */
 @property(nonatomic, readwrite) BOOL hasProperties;
 
+/** 特征值数据 */
 @property(nonatomic, readwrite, copy, null_resettable) NSData *value;
 
 @end
@@ -394,18 +470,24 @@ typedef GPB_ENUM(ProtosBluetoothDescriptor_FieldNumber) {
   ProtosBluetoothDescriptor_FieldNumber_Value = 5,
 };
 
+/**
+ * 蓝牙描述符消息，描述特征值的额外信息
+ **/
 @interface ProtosBluetoothDescriptor : GPBMessage
 
+/** 描述符 UUID */
 @property(nonatomic, readwrite, copy, null_resettable) NSString *uuid;
 
+/** 远程设备 ID */
 @property(nonatomic, readwrite, copy, null_resettable) NSString *remoteId;
 
-/** The service that this descriptor belongs to. */
+/** 所属服务的 UUID */
 @property(nonatomic, readwrite, copy, null_resettable) NSString *serviceUuid;
 
-/** The characteristic that this descriptor belongs to. */
+/** 所属特征值的 UUID */
 @property(nonatomic, readwrite, copy, null_resettable) NSString *characteristicUuid;
 
+/** 描述符值 */
 @property(nonatomic, readwrite, copy, null_resettable) NSData *value;
 
 @end
@@ -425,26 +507,39 @@ typedef GPB_ENUM(ProtosCharacteristicProperties_FieldNumber) {
   ProtosCharacteristicProperties_FieldNumber_IndicateEncryptionRequired = 10,
 };
 
+/**
+ * 特征值属性消息，描述特征值支持的操作
+ **/
 @interface ProtosCharacteristicProperties : GPBMessage
 
+/** 是否支持广播 */
 @property(nonatomic, readwrite) BOOL broadcast;
 
+/** 是否支持读取 */
 @property(nonatomic, readwrite) BOOL read;
 
+/** 是否支持无响应写入 */
 @property(nonatomic, readwrite) BOOL writeWithoutResponse;
 
+/** 是否支持写入 */
 @property(nonatomic, readwrite) BOOL write;
 
+/** 是否支持通知 */
 @property(nonatomic, readwrite) BOOL notify;
 
+/** 是否支持指示 */
 @property(nonatomic, readwrite) BOOL indicate;
 
+/** 是否支持认证签名写入 */
 @property(nonatomic, readwrite) BOOL authenticatedSignedWrites;
 
+/** 是否有扩展属性 */
 @property(nonatomic, readwrite) BOOL extendedProperties;
 
+/** 通知是否需要加密 */
 @property(nonatomic, readwrite) BOOL notifyEncryptionRequired;
 
+/** 指示是否需要加密 */
 @property(nonatomic, readwrite) BOOL indicateEncryptionRequired;
 
 @end
@@ -456,10 +551,15 @@ typedef GPB_ENUM(ProtosDiscoverServicesResult_FieldNumber) {
   ProtosDiscoverServicesResult_FieldNumber_ServicesArray = 2,
 };
 
+/**
+ * 服务发现结果消息
+ **/
 @interface ProtosDiscoverServicesResult : GPBMessage
 
+/** 远程设备 ID */
 @property(nonatomic, readwrite, copy, null_resettable) NSString *remoteId;
 
+/** 发现的服务列表 */
 @property(nonatomic, readwrite, strong, null_resettable) NSMutableArray<ProtosBluetoothService*> *servicesArray;
 /** The number of items in @c servicesArray without causing the array to be created. */
 @property(nonatomic, readonly) NSUInteger servicesArray_Count;
@@ -475,14 +575,21 @@ typedef GPB_ENUM(ProtosReadCharacteristicRequest_FieldNumber) {
   ProtosReadCharacteristicRequest_FieldNumber_SecondaryServiceUuid = 4,
 };
 
+/**
+ * 读取特征值请求消息
+ **/
 @interface ProtosReadCharacteristicRequest : GPBMessage
 
+/** 远程设备 ID */
 @property(nonatomic, readwrite, copy, null_resettable) NSString *remoteId;
 
+/** 特征值 UUID */
 @property(nonatomic, readwrite, copy, null_resettable) NSString *characteristicUuid;
 
+/** 服务 UUID */
 @property(nonatomic, readwrite, copy, null_resettable) NSString *serviceUuid;
 
+/** 次级服务 UUID */
 @property(nonatomic, readwrite, copy, null_resettable) NSString *secondaryServiceUuid;
 
 @end
@@ -494,10 +601,15 @@ typedef GPB_ENUM(ProtosReadCharacteristicResponse_FieldNumber) {
   ProtosReadCharacteristicResponse_FieldNumber_Characteristic = 2,
 };
 
+/**
+ * 读取特征值响应消息
+ **/
 @interface ProtosReadCharacteristicResponse : GPBMessage
 
+/** 远程设备 ID */
 @property(nonatomic, readwrite, copy, null_resettable) NSString *remoteId;
 
+/** 读取的特征值 */
 @property(nonatomic, readwrite, strong, null_resettable) ProtosBluetoothCharacteristic *characteristic;
 /** Test to see if @c characteristic has been set. */
 @property(nonatomic, readwrite) BOOL hasCharacteristic;
@@ -514,16 +626,24 @@ typedef GPB_ENUM(ProtosReadDescriptorRequest_FieldNumber) {
   ProtosReadDescriptorRequest_FieldNumber_CharacteristicUuid = 5,
 };
 
+/**
+ * 读取描述符请求消息
+ **/
 @interface ProtosReadDescriptorRequest : GPBMessage
 
+/** 远程设备 ID */
 @property(nonatomic, readwrite, copy, null_resettable) NSString *remoteId;
 
+/** 描述符 UUID */
 @property(nonatomic, readwrite, copy, null_resettable) NSString *descriptorUuid;
 
+/** 服务 UUID */
 @property(nonatomic, readwrite, copy, null_resettable) NSString *serviceUuid;
 
+/** 次级服务 UUID */
 @property(nonatomic, readwrite, copy, null_resettable) NSString *secondaryServiceUuid;
 
+/** 特征值 UUID */
 @property(nonatomic, readwrite, copy, null_resettable) NSString *characteristicUuid;
 
 @end
@@ -535,12 +655,17 @@ typedef GPB_ENUM(ProtosReadDescriptorResponse_FieldNumber) {
   ProtosReadDescriptorResponse_FieldNumber_Value = 2,
 };
 
+/**
+ * 读取描述符响应消息
+ **/
 @interface ProtosReadDescriptorResponse : GPBMessage
 
+/** 原始请求 */
 @property(nonatomic, readwrite, strong, null_resettable) ProtosReadDescriptorRequest *request;
 /** Test to see if @c request has been set. */
 @property(nonatomic, readwrite) BOOL hasRequest;
 
+/** 读取的值 */
 @property(nonatomic, readwrite, copy, null_resettable) NSData *value;
 
 @end
@@ -556,18 +681,27 @@ typedef GPB_ENUM(ProtosWriteCharacteristicRequest_FieldNumber) {
   ProtosWriteCharacteristicRequest_FieldNumber_Value = 6,
 };
 
+/**
+ * 写入特征值请求消息
+ **/
 @interface ProtosWriteCharacteristicRequest : GPBMessage
 
+/** 远程设备 ID */
 @property(nonatomic, readwrite, copy, null_resettable) NSString *remoteId;
 
+/** 特征值 UUID */
 @property(nonatomic, readwrite, copy, null_resettable) NSString *characteristicUuid;
 
+/** 服务 UUID */
 @property(nonatomic, readwrite, copy, null_resettable) NSString *serviceUuid;
 
+/** 次级服务 UUID */
 @property(nonatomic, readwrite, copy, null_resettable) NSString *secondaryServiceUuid;
 
+/** 写入类型 */
 @property(nonatomic, readwrite) ProtosWriteCharacteristicRequest_WriteType writeType;
 
+/** 要写入的值 */
 @property(nonatomic, readwrite, copy, null_resettable) NSData *value;
 
 @end
@@ -591,12 +725,17 @@ typedef GPB_ENUM(ProtosWriteCharacteristicResponse_FieldNumber) {
   ProtosWriteCharacteristicResponse_FieldNumber_Success = 2,
 };
 
+/**
+ * 写入特征值响应消息
+ **/
 @interface ProtosWriteCharacteristicResponse : GPBMessage
 
+/** 原始请求 */
 @property(nonatomic, readwrite, strong, null_resettable) ProtosWriteCharacteristicRequest *request;
 /** Test to see if @c request has been set. */
 @property(nonatomic, readwrite) BOOL hasRequest;
 
+/** 是否成功 */
 @property(nonatomic, readwrite) BOOL success;
 
 @end
@@ -612,18 +751,27 @@ typedef GPB_ENUM(ProtosWriteDescriptorRequest_FieldNumber) {
   ProtosWriteDescriptorRequest_FieldNumber_Value = 6,
 };
 
+/**
+ * 写入描述符请求消息
+ **/
 @interface ProtosWriteDescriptorRequest : GPBMessage
 
+/** 远程设备 ID */
 @property(nonatomic, readwrite, copy, null_resettable) NSString *remoteId;
 
+/** 描述符 UUID */
 @property(nonatomic, readwrite, copy, null_resettable) NSString *descriptorUuid;
 
+/** 服务 UUID */
 @property(nonatomic, readwrite, copy, null_resettable) NSString *serviceUuid;
 
+/** 次级服务 UUID */
 @property(nonatomic, readwrite, copy, null_resettable) NSString *secondaryServiceUuid;
 
+/** 特征值 UUID */
 @property(nonatomic, readwrite, copy, null_resettable) NSString *characteristicUuid;
 
+/** 要写入的值 */
 @property(nonatomic, readwrite, copy, null_resettable) NSData *value;
 
 @end
@@ -635,12 +783,17 @@ typedef GPB_ENUM(ProtosWriteDescriptorResponse_FieldNumber) {
   ProtosWriteDescriptorResponse_FieldNumber_Success = 2,
 };
 
+/**
+ * 写入描述符响应消息
+ **/
 @interface ProtosWriteDescriptorResponse : GPBMessage
 
+/** 原始请求 */
 @property(nonatomic, readwrite, strong, null_resettable) ProtosWriteDescriptorRequest *request;
 /** Test to see if @c request has been set. */
 @property(nonatomic, readwrite) BOOL hasRequest;
 
+/** 是否成功 */
 @property(nonatomic, readwrite) BOOL success;
 
 @end
@@ -655,16 +808,24 @@ typedef GPB_ENUM(ProtosSetNotificationRequest_FieldNumber) {
   ProtosSetNotificationRequest_FieldNumber_Enable = 5,
 };
 
+/**
+ * 设置通知请求消息
+ **/
 @interface ProtosSetNotificationRequest : GPBMessage
 
+/** 远程设备 ID */
 @property(nonatomic, readwrite, copy, null_resettable) NSString *remoteId;
 
+/** 服务 UUID */
 @property(nonatomic, readwrite, copy, null_resettable) NSString *serviceUuid;
 
+/** 次级服务 UUID */
 @property(nonatomic, readwrite, copy, null_resettable) NSString *secondaryServiceUuid;
 
+/** 特征值 UUID */
 @property(nonatomic, readwrite, copy, null_resettable) NSString *characteristicUuid;
 
+/** 是否启用通知 */
 @property(nonatomic, readwrite) BOOL enable;
 
 @end
@@ -677,14 +838,20 @@ typedef GPB_ENUM(ProtosSetNotificationResponse_FieldNumber) {
   ProtosSetNotificationResponse_FieldNumber_Success = 3,
 };
 
+/**
+ * 设置通知响应消息
+ **/
 @interface ProtosSetNotificationResponse : GPBMessage
 
+/** 远程设备 ID */
 @property(nonatomic, readwrite, copy, null_resettable) NSString *remoteId;
 
+/** 相关特征值 */
 @property(nonatomic, readwrite, strong, null_resettable) ProtosBluetoothCharacteristic *characteristic;
 /** Test to see if @c characteristic has been set. */
 @property(nonatomic, readwrite) BOOL hasCharacteristic;
 
+/** 是否成功 */
 @property(nonatomic, readwrite) BOOL success;
 
 @end
@@ -696,10 +863,15 @@ typedef GPB_ENUM(ProtosOnCharacteristicChanged_FieldNumber) {
   ProtosOnCharacteristicChanged_FieldNumber_Characteristic = 2,
 };
 
+/**
+ * 特征值变化通知消息
+ **/
 @interface ProtosOnCharacteristicChanged : GPBMessage
 
+/** 远程设备 ID */
 @property(nonatomic, readwrite, copy, null_resettable) NSString *remoteId;
 
+/** 发生变化的特征值 */
 @property(nonatomic, readwrite, strong, null_resettable) ProtosBluetoothCharacteristic *characteristic;
 /** Test to see if @c characteristic has been set. */
 @property(nonatomic, readwrite) BOOL hasCharacteristic;
@@ -713,10 +885,15 @@ typedef GPB_ENUM(ProtosDeviceStateResponse_FieldNumber) {
   ProtosDeviceStateResponse_FieldNumber_State = 2,
 };
 
+/**
+ * 设备状态响应消息
+ **/
 @interface ProtosDeviceStateResponse : GPBMessage
 
+/** 远程设备 ID */
 @property(nonatomic, readwrite, copy, null_resettable) NSString *remoteId;
 
+/** 设备状态 */
 @property(nonatomic, readwrite) ProtosDeviceStateResponse_BluetoothDeviceState state;
 
 @end
@@ -739,8 +916,12 @@ typedef GPB_ENUM(ProtosConnectedDevicesResponse_FieldNumber) {
   ProtosConnectedDevicesResponse_FieldNumber_DevicesArray = 1,
 };
 
+/**
+ * 已连接设备响应消息
+ **/
 @interface ProtosConnectedDevicesResponse : GPBMessage
 
+/** 已连接的设备列表 */
 @property(nonatomic, readwrite, strong, null_resettable) NSMutableArray<ProtosBluetoothDevice*> *devicesArray;
 /** The number of items in @c devicesArray without causing the array to be created. */
 @property(nonatomic, readonly) NSUInteger devicesArray_Count;
@@ -754,10 +935,15 @@ typedef GPB_ENUM(ProtosMtuSizeRequest_FieldNumber) {
   ProtosMtuSizeRequest_FieldNumber_Mtu = 2,
 };
 
+/**
+ * MTU 大小请求消息
+ **/
 @interface ProtosMtuSizeRequest : GPBMessage
 
+/** 远程设备 ID */
 @property(nonatomic, readwrite, copy, null_resettable) NSString *remoteId;
 
+/** MTU 大小 */
 @property(nonatomic, readwrite) uint32_t mtu;
 
 @end
@@ -769,10 +955,15 @@ typedef GPB_ENUM(ProtosMtuSizeResponse_FieldNumber) {
   ProtosMtuSizeResponse_FieldNumber_Mtu = 2,
 };
 
+/**
+ * MTU 大小响应消息
+ **/
 @interface ProtosMtuSizeResponse : GPBMessage
 
+/** 远程设备 ID */
 @property(nonatomic, readwrite, copy, null_resettable) NSString *remoteId;
 
+/** 协商后的 MTU 大小 */
 @property(nonatomic, readwrite) uint32_t mtu;
 
 @end

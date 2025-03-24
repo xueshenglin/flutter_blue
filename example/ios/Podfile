@@ -1,3 +1,10 @@
+# 添加镜像源
+source 'https://mirrors.tuna.tsinghua.edu.cn/git/CocoaPods/Specs.git'  # 清华镜像
+# source 'https://mirrors.aliyun.com/cocoapods/Specs.git'  # 阿里云镜像,南方用阿里云,北方用清华
+# source 'https://mirrors.huaweicloud.com/cocoapods/Specs.git'  # 华为云镜像
+# source 'https://github.com/CocoaPods/Specs.git'               # GitHub 作为备用
+source '/Users/xue/development/github-git-cocoapods'
+
 platform :ios, '12.0'
 
 # CocoaPods analytics sends network stats synchronously affecting flutter build latency.
@@ -23,7 +30,9 @@ target 'Runner' do
   use_modular_headers!
 
   flutter_install_all_ios_pods File.dirname(File.realpath(__FILE__))
-  pod 'Protobuf', '2.0.0'  # 指定 Protobuf 2.0.0 版本
+  
+  # 添加 Protobuf 依赖
+  pod 'Protobuf', '~> 3.11.4'
 end
 
 post_install do |installer|

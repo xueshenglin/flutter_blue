@@ -90,7 +90,7 @@
 - Dart (pubspec.yaml)：
   ```yaml
   dependencies:
-    protobuf: ^2.0.0
+    protobuf: ^2.0.0  # 注意：Dart 的 protobuf 版本号与其他平台不同
   ```
 
 - Android (build.gradle)：
@@ -103,12 +103,8 @@
 
 - iOS (Podfile)：
   ```ruby
-  pod 'Protobuf'
+  pod 'Protobuf', '~> 3.11.4'  # 使用与 Android 相同的版本
   ```
 
 ### 8. 参考文件
-- `protos/generated` 目录：
-  * 包含历史生成的 Java 代码备份
-  * 用于参考和对比不同版本的生成结果
-  * 不参与实际编译，仅作为参考使用
-  * 建议定期清理，避免占用过多空间 
+- `
