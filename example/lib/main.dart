@@ -8,6 +8,7 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter_blue/flutter_blue.dart';
 import 'widgets.dart';
+import 'bluetooth_permissions.dart';
 
 void main() {
   runApp(FlutterBlueApp());
@@ -32,10 +33,31 @@ class FlutterBlueApp extends StatelessWidget {
   }
 }
 
-class BluetoothOffScreen extends StatelessWidget {
+class BluetoothOffScreen extends StatefulWidget {
   const BluetoothOffScreen({Key? key, this.state}) : super(key: key);
 
   final BluetoothState? state;
+
+  @override
+  State<BluetoothOffScreen> createState() => _BluetoothOffScreenState();
+}
+
+class _BluetoothOffScreenState extends State<BluetoothOffScreen> {
+  bool _permissionsGranted = false;
+  final _bluetoothPermissions = BluetoothPermissions();
+
+  @override
+  void initState() {
+    super.initState();
+    _checkPermissions();
+  }
+
+  Future<void> _checkPermissions() async {
+    final hasPermissions = await _bluetoothPermissions.checkAndRequestPermissions();
+    setState(() {
+      _permissionsGranted = hasPermissions;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -45,13 +67,22 @@ class BluetoothOffScreen extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: <Widget>[
-            Icon(
+            const Icon(
               Icons.bluetooth_disabled,
               size: 200.0,
               color: Colors.white54,
             ),
+            BluetoothPermissionWidget(
+              permissionsGranted: _permissionsGranted,
+              onPermissionGranted: () {
+                setState(() {
+                  _permissionsGranted = true;
+                });
+              },
+              onRequestPermissions: _checkPermissions,
+            ),
             Text(
-              'Bluetooth Adapter is ${state != null ? state.toString().substring(15) : 'not available'}.',
+              '蓝牙适配器状态: ${widget.state != null ? widget.state.toString().substring(15) : '不可用'}.',
               style: Theme.of(context)
                   .primaryTextTheme
                   .titleMedium
