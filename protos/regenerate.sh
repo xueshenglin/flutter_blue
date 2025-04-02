@@ -10,13 +10,16 @@ PROJECT_ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$PROJECT_ROOT/protos"
 
 echo "Generating Dart code..."
-protoc --dart_out=../lib/gen/protos \
+
+# dart 的文件未验证.谨慎使用重新生成的文件. 建议保留就旧文件即可 2025-4-2
+./protoc-3.11.4-osx-x86_64/bin/protoc --dart_out=../lib/gen/protos \
        --proto_path=. \
        flutterblue.proto
 
 echo "Generating Java code..."
 echo "需要使用 lite 版本生成,适合移动端节约内存"
-protoc --java_out=lite:../android/src/generated/source/proto/release/java \
+# 使用指定版本的 protoc 程序 (protoc 3.11.4),不要用系统自带的 protoc,否则使用 MapEntryLite会报错
+./protoc-3.11.4-osx-x86_64/bin/protoc --java_out=lite:../android/src/generated/source/proto/release/java \
        --proto_path=. \
        flutterblue.proto
 
