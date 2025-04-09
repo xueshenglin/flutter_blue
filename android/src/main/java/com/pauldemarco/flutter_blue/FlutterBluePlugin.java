@@ -154,12 +154,18 @@ public class FlutterBluePlugin implements FlutterPlugin, ActivityAware, MethodCa
         synchronized(tearDownLock){
             Log.i(TAG, "teardown");
             context = null;
-            activityBinding.removeRequestPermissionsResultListener(this);
-            activityBinding = null;
-            channel.setMethodCallHandler(null);
-            channel = null;
-            stateChannel.setStreamHandler(null);
-            stateChannel = null;
+            if (activityBinding != null) {
+                activityBinding.removeRequestPermissionsResultListener(this);
+                activityBinding = null;
+            }
+            if (channel != null) {
+                channel.setMethodCallHandler(null);
+                channel = null;
+            }
+            if (stateChannel != null) {
+                stateChannel.setStreamHandler(null);
+                stateChannel = null;
+            }
             mBluetoothAdapter = null;
             mBluetoothManager = null;
             application = null;
