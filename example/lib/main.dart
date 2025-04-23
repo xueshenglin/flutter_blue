@@ -95,7 +95,14 @@ class _BluetoothOffScreenState extends State<BluetoothOffScreen> {
   }
 }
 
-class FindDevicesScreen extends StatelessWidget {
+class FindDevicesScreen extends StatefulWidget {
+  @override
+  _FindDevicesScreenState createState() => _FindDevicesScreenState();
+}
+
+class _FindDevicesScreenState extends State<FindDevicesScreen> {
+  String? _broadcastData;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -108,6 +115,57 @@ class FindDevicesScreen extends StatelessWidget {
         child: SingleChildScrollView(
           child: Column(
             children: <Widget>[
+              Card(
+                margin: EdgeInsets.all(8.0),
+                child: Padding(
+                  padding: EdgeInsets.all(16.0),
+                  child: Column(
+                    children: [
+                      Text('广播控制', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                      SizedBox(height: 16),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        children: [
+                          ElevatedButton(
+                            onPressed: () => FlutterBlue.instance.startAdvertising(),
+                            child: Text('开始广播'),
+                          ),
+                          ElevatedButton(
+                            onPressed: () => FlutterBlue.instance.stopAdvertising(),
+                            child: Text('停止广播'),
+                          ),
+                        ],
+                      ),
+                      SizedBox(height: 16),
+                      TextField(
+                        decoration: InputDecoration(
+                          labelText: '输入十六进制数据(用空格分隔)',
+                          border: OutlineInputBorder(),
+                        ),
+                        onChanged: (value) {
+                          setState(() {
+                            _broadcastData = value;
+                          });
+                        },
+                      ),
+                      SizedBox(height: 8),
+                      ElevatedButton(
+                        onPressed: () {
+                          if (_broadcastData != null) {
+                            // 将输入的十六进制字符串转换为List<int>
+                            List<int> data = _broadcastData!
+                                .split(' ')
+                                .map((e) => int.parse(e, radix: 16))
+                                .toList();
+                            FlutterBlue.instance.setAdvertisingData(data);
+                          }
+                        },
+                        child: Text('设置厂商数据'),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
               StreamBuilder<List<BluetoothDevice>>(
                 stream: Stream.periodic(Duration(seconds: 2))
                     .asyncMap((_) => FlutterBlue.instance.connectedDevices),

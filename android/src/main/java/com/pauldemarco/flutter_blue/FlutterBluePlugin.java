@@ -65,6 +65,7 @@ public class FlutterBluePlugin implements FlutterPlugin, ActivityAware, MethodCa
     private Context context;
     private MethodChannel channel;
     private static final String NAMESPACE = "plugins.pauldemarco.com/flutter_blue";
+    private BluetoothAdvertiser mBluetoothAdvertiser;
 
     private EventChannel stateChannel;
     private BluetoothManager mBluetoothManager;
@@ -147,6 +148,7 @@ public class FlutterBluePlugin implements FlutterPlugin, ActivityAware, MethodCa
             stateChannel.setStreamHandler(stateHandler);
             mBluetoothManager = (BluetoothManager) application.getSystemService(Context.BLUETOOTH_SERVICE);
             mBluetoothAdapter = mBluetoothManager.getAdapter();
+            mBluetoothAdvertiser = new BluetoothAdvertiser(application);
         }
     }
 
@@ -620,6 +622,46 @@ public class FlutterBluePlugin implements FlutterPlugin, ActivityAware, MethodCa
                 break;
             }
 
+            case "startAdvertising":
+            {
+                try {
+                    mBluetoothAdvertiser.startAdvertising();
+                    result.success(null);
+                } catch (Exception e) {
+                    result.error("startAdvertising_error", e.getMessage(), e);
+                }
+                break;
+            }
+            case "stopAdvertising":
+            {
+                try {
+                    mBluetoothAdvertiser.stopAdvertising();
+                    result.success(null);
+                } catch (Exception e) {
+                    result.error("stopAdvertising_error", e.getMessage(), e);
+                }
+                break;
+            }
+            case "isAdvertising":
+            {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                    result.success(mBluetoothAdvertiser.isAdvertising());
+                } else {
+                    result.error("unsupported_operation", "Advertising not supported on this Android version", null);
+                }
+                break;
+            }
+            case "setAdvertisingData":
+            {
+                byte[] data = call.arguments();
+                try {
+                    mBluetoothAdvertiser.setAdvertisingData(data);
+                    result.success(null);
+                } catch (Exception e) {
+                    result.error("setAdvertisingData_error", e.getMessage(), e);
+                }
+                break;
+            }
             default:
             {
                 result.notImplemented();

@@ -196,6 +196,25 @@ class FlutterBlue {
       print(message);
     }
   }
+
+  /// 开始广播
+  Future<void> startAdvertising() async {
+    await _channel.invokeMethod('startAdvertising');
+  }
+
+  /// 停止广播
+  Future<void> stopAdvertising() async {
+    await _channel.invokeMethod('stopAdvertising');
+  }
+
+  /// 查询当前是否在广播状态
+  Future<bool> get isAdvertising => _channel.invokeMethod('isAdvertising').then<bool>((d) => d);
+
+  /// 设置广播数据
+  /// [data] 十六进制数据列表，将作为厂商自定义数据广播
+  Future<void> setAdvertisingData(List<int> data) async {
+    await _channel.invokeMethod('setAdvertisingData', Uint8List.fromList(data));
+  }
 }
 
 /// Log levels for FlutterBlue

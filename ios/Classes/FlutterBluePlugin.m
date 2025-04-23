@@ -4,6 +4,7 @@
 
 #import "FlutterBluePlugin.h"
 #import "Flutterblue.pbobjc.h"
+#import "BluetoothAdvertiser.h"
 
 @interface CBUUID (CBUUIDAdditionsFlutterBlue)
 - (NSString *)fullUUIDString;
@@ -38,6 +39,7 @@ typedef NS_ENUM(NSUInteger, LogLevel) {
 @property(nonatomic) NSMutableArray *servicesThatNeedDiscovered;
 @property(nonatomic) NSMutableArray *characteristicsThatNeedDiscovered;
 @property(nonatomic) LogLevel logLevel;
+@property(nonatomic, strong) BluetoothAdvertiser *bluetoothAdvertiser; // Add this line
 @end
 
 @implementation FlutterBluePlugin
@@ -53,6 +55,7 @@ typedef NS_ENUM(NSUInteger, LogLevel) {
   instance.servicesThatNeedDiscovered = [NSMutableArray new];
   instance.characteristicsThatNeedDiscovered = [NSMutableArray new];
   instance.logLevel = emergency;
+  instance.bluetoothAdvertiser = [[BluetoothAdvertiser alloc] init]; // Add this line
   
   // STATE
   FlutterBlueStreamHandler* stateStreamHandler = [[FlutterBlueStreamHandler alloc] init];
@@ -253,6 +256,19 @@ typedef NS_ENUM(NSUInteger, LogLevel) {
     }
   } else if([@"requestMtu" isEqualToString:call.method]) {
     result([FlutterError errorWithCode:@"requestMtu" message:@"iOS does not allow mtu requests to the peripheral" details:NULL]);
+  } else if([@"startAdvertising" isEqualToString:call.method]) {
+    [self startAdvertising];
+    result(nil);
+  } else if([@"stopAdvertising" isEqualToString:call.method]) {
+    [self stopAdvertising];
+    result(nil);
+  } else if([@"isAdvertising" isEqualToString:call.method]) {
+    result(@([self isAdvertising]));
+  } else if([@"setAdvertisingData" isEqualToString:call.method]) {
+    FlutterStandardTypedData *data = [call arguments];
+    NSArray *hexData = [self toFlutterDataToHexArray:data];
+    [self setAdvertisingData:hexData];
+    result(nil);
   } else {
     result(FlutterMethodNotImplemented);
   }
@@ -754,6 +770,34 @@ typedef NS_ENUM(NSUInteger, LogLevel) {
     // Fallback to minimum on earlier versions. (issue #364)
     return 20;
   }
+}
+
+- (void)startAdvertising {
+    [self.bluetoothAdvertiser startAdvertising];
+}
+
+- (void)stopAdvertising {
+    [self.bluetoothAdvertiser stopAdvertising];
+}
+
+- (void)setAdvertisingData:(NSArray *)hexData {
+    [self.bluetoothAdvertiser setAdvertisingData:hexData];
+}
+
+- (BOOL)isAdvertising {
+    return [self.bluetoothAdvertiser isAdvertising];
+}
+
+- (NSArray *)toFlutterDataToHexArray:(FlutterStandardTypedData *)data {
+    NSMutableArray *hexArray = [NSMutableArray array];
+    const uint8_t *bytes = [data.data bytes];
+    NSUInteger length = [data.data length];
+    
+    for (NSUInteger i = 0; i < length; i++) {
+        [hexArray addObject:@(bytes[i])];
+    }
+    
+    return hexArray;
 }
 
 @end
