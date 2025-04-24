@@ -62,12 +62,12 @@ public class ProtoMaker {
         if(scanRecord != null) {
             String deviceName = scanRecord.getDeviceName();
             if(deviceName != null) {
-                Log.d("FlutterBlue", "Device name: " + deviceName);
+                // Log.d("FlutterBlue", "Device name: " + deviceName);
                 a.setLocalName(deviceName);
             }
             int txPower = scanRecord.getTxPowerLevel();
             if(txPower != Integer.MIN_VALUE) {
-                Log.d("FlutterBlue", "Tx power: " + txPower);
+                // Log.d("FlutterBlue", "Tx power: " + txPower);
                 a.setTxPowerLevel(Protos.Int32Value.newBuilder().setValue(txPower));
             }
             // Manufacturer Specific Data
@@ -77,12 +77,12 @@ public class ProtoMaker {
                     try {
                         int key = msd.keyAt(i);
                         byte[] value = msd.valueAt(i);
-                        Log.d("FlutterBlue", "Adding manufacturer data: " + key + ", length: " + (value != null ? value.length : "null"));
+                       // Log.d("FlutterBlue", "Adding manufacturer data: " + key + ", length: " + (value != null ? value.length : "null"));
                         if (value != null) {
                             a.putManufacturerData(key, ByteString.copyFrom(value));
                         }
                     } catch (Exception e) {
-                        Log.e("FlutterBlue", "Error adding manufacturer data", e);
+                        // Log.e("FlutterBlue", "Error adding manufacturer data", e);
                     }
                 }
             }
@@ -90,17 +90,17 @@ public class ProtoMaker {
             // Service Data
             Map<ParcelUuid, byte[]> serviceData = scanRecord.getServiceData();
             if(serviceData != null) {
-                Log.d("FlutterBlue", "Service data size: " + serviceData.size());
+                // Log.d("FlutterBlue", "Service data size: " + serviceData.size());
                 for (Map.Entry<ParcelUuid, byte[]> entry : serviceData.entrySet()) {
                     try {
                         ParcelUuid key = entry.getKey();
                         byte[] value = entry.getValue();
                         if(key != null && value != null) {
                             String uuidString = key.getUuid().toString();
-                            Log.d("FlutterBlue", "Adding service data for UUID: " + uuidString + ", length: " + value.length);
+                            // Log.d("FlutterBlue", "Adding service data for UUID: " + uuidString + ", length: " + value.length);
                             a.putServiceData(uuidString, ByteString.copyFrom(value));
                         } else {
-                            Log.w("FlutterBlue", "Service data entry has null key or value");
+                            // Log.w("FlutterBlue", "Service data entry has null key or value");
                         }
                     } catch (Exception e) {
                         Log.e("FlutterBlue", "Error adding service data", e);
@@ -111,34 +111,34 @@ public class ProtoMaker {
             // Service UUIDs
             List<ParcelUuid> serviceUuids = scanRecord.getServiceUuids();
             if(serviceUuids != null) {
-                Log.d("FlutterBlue", "Service UUIDs size: " + serviceUuids.size());
+                // Log.d("FlutterBlue", "Service UUIDs size: " + serviceUuids.size());
                 for (ParcelUuid s : serviceUuids) {
                     try {
                         if(s != null) {
                             String uuidString = s.getUuid().toString();
-                            Log.d("FlutterBlue", "Adding service UUID: " + uuidString);
+                            // Log.d("FlutterBlue", "Adding service UUID: " + uuidString);
                             a.addServiceUuids(uuidString);
                         } else {
-                            Log.w("FlutterBlue", "Service UUID is null");
+                            // Log.w("FlutterBlue", "Service UUID is null");
                         }
                     } catch (Exception e) {
-                        Log.e("FlutterBlue", "Error adding service UUID", e);
+                        // Log.e("FlutterBlue", "Error adding service UUID", e);
                     }
                 }
             }
         } else {
-            Log.d("FlutterBlue", "Scan record is null");
+            // Log.d("FlutterBlue", "Scan record is null");
         }
         
-        Log.d("FlutterBlue", "Building advertisement data...");
-        // 打印当前 AdvertisementData.Builder 的状态
-        Log.d("FlutterBlue", "Advertisement data state before build:");
-        Log.d("FlutterBlue", "  - Manufacturer data size: " + a.getManufacturerDataCount());
-        Log.d("FlutterBlue", "  - Service data size: " + a.getServiceDataCount());
-        Log.d("FlutterBlue", "  - Service UUIDs size: " + a.getServiceUuidsCount());
+        // Log.d("FlutterBlue", "Building advertisement data...");
+        // // 打印当前 AdvertisementData.Builder 的状态
+        // Log.d("FlutterBlue", "Advertisement data state before build:");
+        // Log.d("FlutterBlue", "  - Manufacturer data size: " + a.getManufacturerDataCount());
+        // Log.d("FlutterBlue", "  - Service data size: " + a.getServiceDataCount());
+        // Log.d("FlutterBlue", "  - Service UUIDs size: " + a.getServiceUuidsCount());
         
         try {
-            Log.d("FlutterBlue", "Building advertisement data...");
+            // Log.d("FlutterBlue", "Building advertisement data...");
             
             // 创建一个新的 builder
             Protos.AdvertisementData.Builder newBuilder = Protos.AdvertisementData.newBuilder();
@@ -164,7 +164,7 @@ public class ProtoMaker {
                         manufacturerData.put(entry.getKey(), entry.getValue());
                     }
                 } catch (Exception e) {
-                    Log.e("FlutterBlue", "Error processing manufacturer data entry", e);
+                    // Log.e("FlutterBlue", "Error processing manufacturer data entry", e);
                 }
             }
             
@@ -176,7 +176,7 @@ public class ProtoMaker {
                         serviceData.put(entry.getKey(), entry.getValue());
                     }
                 } catch (Exception e) {
-                    Log.e("FlutterBlue", "Error processing service data entry", e);
+                    // Log.e("FlutterBlue", "Error processing service data entry", e);
                 }
             }
             
@@ -188,7 +188,7 @@ public class ProtoMaker {
                         serviceUuids.add(uuid);
                     }
                 } catch (Exception e) {
-                    Log.e("FlutterBlue", "Error processing service UUID", e);
+                    // Log.e("FlutterBlue", "Error processing service UUID", e);
                 }
             }
             
@@ -206,18 +206,18 @@ public class ProtoMaker {
             }
             
             Protos.AdvertisementData advertisementData = newBuilder.build();
-            Log.d("FlutterBlue", "Built advertisement data");
+            // Log.d("FlutterBlue", "Built advertisement data");
             
-            Log.d("FlutterBlue", "Setting advertisement data...");
+            // Log.d("FlutterBlue", "Setting advertisement data...");
             p.setAdvertisementData(advertisementData);
-            Log.d("FlutterBlue", "Set advertisement data");
+            // Log.d("FlutterBlue", "Set advertisement data");
             
-            Log.d("FlutterBlue", "Building final result...");
+            // Log.d("FlutterBlue", "Building final result...");
             Protos.ScanResult result = p.build();
-            Log.d("FlutterBlue", "Built final result");
+            // Log.d("FlutterBlue", "Built final result");
             return result;
         } catch (Exception e) {
-            Log.e("FlutterBlue", "Error building advertisement data", e);
+            // Log.e("FlutterBlue", "Error building advertisement data", e);
             e.printStackTrace();
             // 返回一个基本的扫描结果
             return Protos.ScanResult.newBuilder()

@@ -22,7 +22,8 @@ import android.os.Build;
 // 导入日志类
 import android.util.Log;
 // 导入字节数组类
-import java.util.Arrays; 
+import java.util.Arrays;
+
 /**
  * 蓝牙广播器类，用于管理蓝牙低功耗广播功能。
  */
@@ -34,7 +35,21 @@ public class BluetoothAdvertiser {
     // 上下文对象
     private Context context;
     // 蓝牙广播回调实例
-    private AdvertiseCallback advertiseCallback;
+    private AdvertiseCallback advertiseCallback = new AdvertiseCallback() {
+        @Override
+        public void onStartSuccess(AdvertiseSettings settingsInEffect) {
+            super.onStartSuccess(settingsInEffect);
+            isAdvertising = true; // 确保状态同步
+            Log.i(TAG, "Advertising started successfully.");
+        }
+
+        @Override
+        public void onStartFailure(int errorCode) {
+            super.onStartFailure(errorCode);
+            isAdvertising = false; // 确保状态同步
+            Log.e(TAG, "Advertising failed with error code: " + errorCode);
+        }
+    };
     // 蓝牙广播数据实例
     private AdvertiseData advertiseData;
     // 广告状态标志. 由于Android 没有提供直接获取广告状态的方法，
@@ -45,6 +60,7 @@ public class BluetoothAdvertiser {
 
     /**
      * 构造函数，初始化蓝牙广播器。
+     * 
      * @param context 上下文对象
      */
     public BluetoothAdvertiser(Context context) {
@@ -59,10 +75,10 @@ public class BluetoothAdvertiser {
             bluetoothLeAdvertiser = bluetoothAdapter.getBluetoothLeAdvertiser();
         }
         this.advertiseSettings = new AdvertiseSettings.Builder()
-               .setAdvertiseMode(AdvertiseSettings.ADVERTISE_MODE_LOW_LATENCY)
-               .setTxPowerLevel(AdvertiseSettings.ADVERTISE_TX_POWER_HIGH)
-               .setConnectable(false)
-               .build();
+                .setAdvertiseMode(AdvertiseSettings.ADVERTISE_MODE_LOW_LATENCY)
+                .setTxPowerLevel(AdvertiseSettings.ADVERTISE_TX_POWER_HIGH)
+                .setConnectable(false)
+                .build();
     }
 
     /**
@@ -73,33 +89,6 @@ public class BluetoothAdvertiser {
         if (bluetoothLeAdvertiser == null) {
             Log.e(TAG, "Bluetooth LE advertiser is not available.");
             return;
-        }
-
-        // 更新广播设置为仅厂商数据
-        AdvertiseSettings settings = new AdvertiseSettings.Builder()
-               .setAdvertiseMode(AdvertiseSettings.ADVERTISE_MODE_LOW_LATENCY)
-               .setTxPowerLevel(AdvertiseSettings.ADVERTISE_TX_POWER_HIGH)
-               .setConnectable(false)  // 设置为不可连接
-               .build();
-
-        // 检查广播回调是否已初始化
-        if (advertiseCallback == null) {
-            // 创建广播回调实例
-            advertiseCallback = new AdvertiseCallback() {
-                @Override
-                public void onStartSuccess(AdvertiseSettings settingsInEffect) {
-                    super.onStartSuccess(settingsInEffect);
-                    isAdvertising = true;  // 确保状态同步
-                    Log.i(TAG, "Advertising started successfully.");
-                }
-
-                @Override
-                public void onStartFailure(int errorCode) {
-                    super.onStartFailure(errorCode);
-                    isAdvertising = false;  // 确保状态同步
-                    Log.e(TAG, "Advertising failed with error code: " + errorCode);
-                }
-            };
         }
 
         // 启动蓝牙低功耗广播
@@ -120,13 +109,14 @@ public class BluetoothAdvertiser {
         if (bluetoothLeAdvertiser != null && advertiseCallback != null) {
             // 停止蓝牙低功耗广播
             bluetoothLeAdvertiser.stopAdvertising(advertiseCallback);
-            isAdvertising = false;  // 设置广告状态为false
+            isAdvertising = false; // 设置广告状态为false
             Log.i(TAG, "Advertising stopped.");
         }
     }
 
     /**
      * 检查当前是否在广播状态
+     * 
      * @return true表示正在广播，false表示未广播
      */
     @TargetApi(Build.VERSION_CODES.LOLLIPOP)
@@ -136,6 +126,7 @@ public class BluetoothAdvertiser {
 
     /**
      * 设置蓝牙低功耗广播数据并重新启动广播。
+     * 
      * @param data 要设置的广播数据
      */
     @TargetApi(Build.VERSION_CODES.LOLLIPOP)
@@ -152,13 +143,13 @@ public class BluetoothAdvertiser {
 
         // 仅设置厂商数据，不包含其他信息
         this.advertiseData = new AdvertiseData.Builder()
-               .setIncludeDeviceName(false)
-               .setIncludeTxPowerLevel(false)
-               .addManufacturerData(
-                   ((data[0] & 0xFF) << 8) | (data[1] & 0xFF),  // 前两个字节作为厂商ID
-                   Arrays.copyOfRange(data, 2, data.length)      // 剩余字节作为数据
-               )
-               .build();
+                .setIncludeDeviceName(false)
+                .setIncludeTxPowerLevel(false)
+                .addManufacturerData(
+                        ((data[0] & 0xFF) << 8) | (data[1] & 0xFF), // 前两个字节作为厂商ID
+                        Arrays.copyOfRange(data, 2, data.length) // 剩余字节作为数据
+                )
+                .build();
 
         // 停止当前广播
         stopAdvertising();
