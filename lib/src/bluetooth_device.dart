@@ -30,12 +30,13 @@ class BluetoothDevice {
     if (timeout != null) {
       timer = Timer(timeout, () {
         disconnect();
-        throw TimeoutException('Failed to connect in time.', timeout);
+        timer?.cancel();
+        // throw TimeoutException('Failed to connect in time.', timeout);
       });
     }
 
     await FlutterBlue.instance._channel
-        .invokeMethod('connect', request.writeToBuffer());
+        .invokeMethod('connect', request.writeToBuffer()).timeout(timeout!=null? timeout: Duration(seconds: 10));
 
     await state.firstWhere((s) => s == BluetoothDeviceState.connected);
 
