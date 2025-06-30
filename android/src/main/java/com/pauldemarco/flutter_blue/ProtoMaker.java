@@ -211,6 +211,9 @@ public class ProtoMaker {
             // Log.d("FlutterBlue", "Setting advertisement data...");
             p.setAdvertisementData(advertisementData);
             // Log.d("FlutterBlue", "Set advertisement data");
+
+            //2025-6-30 修改 rssi=0 bug 导致android 手机无法限制距离
+            p.setRssi(scanResult.getRssi());
             
             // Log.d("FlutterBlue", "Building final result...");
             Protos.ScanResult result = p.build();
