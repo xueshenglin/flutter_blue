@@ -61,7 +61,7 @@ import io.flutter.plugin.common.PluginRegistry;
 public class FlutterBluePlugin implements FlutterPlugin, ActivityAware, MethodCallHandler, PluginRegistry.RequestPermissionsResultListener {
     private static final String TAG = "FlutterBluePlugin";
     private Object initializationLock = new Object();
-    private Object tearDownLock = new Object();
+    private static final Object tearDownLock = new Object();
     private Context context;
     private MethodChannel channel;
     private static final String NAMESPACE = "plugins.pauldemarco.com/flutter_blue";

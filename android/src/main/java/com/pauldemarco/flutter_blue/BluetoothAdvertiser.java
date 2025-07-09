@@ -1,23 +1,23 @@
-// 定义包名
+// Define package name
 package com.pauldemarco.flutter_blue;
 
-// 导入必要的注解类
+// Import necessary annotation classes
 import android.annotation.TargetApi;
-// 导入蓝牙适配器类
+// Import Bluetooth adapter class
 import android.bluetooth.BluetoothAdapter;
-// 导入蓝牙管理器类
+// Import Bluetooth manager class
 import android.bluetooth.BluetoothManager;
-// 导入蓝牙广播回调类
+// Import Bluetooth advertise callback class
 import android.bluetooth.le.AdvertiseCallback;
-// 导入蓝牙广播数据类
+// Import Bluetooth advertise data class
 import android.bluetooth.le.AdvertiseData;
-// 导入蓝牙广播设置类
+// Import Bluetooth advertise settings class
 import android.bluetooth.le.AdvertiseSettings;
-// 导入蓝牙低功耗广播器类
+// Import Bluetooth Low Energy advertiser class
 import android.bluetooth.le.BluetoothLeAdvertiser;
-// 导入上下文类
+// Import context class
 import android.content.Context;
-// 导入系统版本类
+// Import system version class
 import android.os.Build;
 // 导入日志类
 import android.util.Log;
@@ -25,16 +25,16 @@ import android.util.Log;
 import java.util.Arrays;
 
 /**
- * 蓝牙广播器类，用于管理蓝牙低功耗广播功能。
+ * Bluetooth advertiser class for managing Bluetooth Low Energy advertising functionality.
  */
 public class BluetoothAdvertiser {
-    // 日志标签
+    // Log tag
     private static final String TAG = "BluetoothAdvertiser";
-    // 蓝牙低功耗广播器实例
+    // Bluetooth Low Energy advertiser instance
     private BluetoothLeAdvertiser bluetoothLeAdvertiser;
-    // 上下文对象
+    // Context object
     private Context context;
-    // 蓝牙广播回调实例
+    // Bluetooth advertise callback instance
     private AdvertiseCallback advertiseCallback = new AdvertiseCallback() {
         @Override
         public void onStartSuccess(AdvertiseSettings settingsInEffect) {
@@ -50,28 +50,28 @@ public class BluetoothAdvertiser {
             Log.e(TAG, "Advertising failed with error code: " + errorCode);
         }
     };
-    // 蓝牙广播数据实例
+    // Bluetooth advertise data instance
     private AdvertiseData advertiseData;
-    // 广告状态标志. 由于Android 没有提供直接获取广告状态的方法，
-    // 我们需要自己维护一个标志来表示当前是否正在广播。
-    // 这个标志可以在 startAdvertising 和 stopAdvertising 方法中进行同步。
+    // Advertising status flag. Since Android does not provide a direct method to get advertising status,
+    // we need to maintain our own flag to indicate whether advertising is currently active.
+    // This flag is synchronized in the startAdvertising and stopAdvertising methods.
     private boolean isAdvertising = false;
     private AdvertiseSettings advertiseSettings;
 
     /**
-     * 构造函数，初始化蓝牙广播器。
+     * Constructor to initialize the Bluetooth advertiser.
      * 
-     * @param context 上下文对象
+     * @param context Context object
      */
     public BluetoothAdvertiser(Context context) {
         this.context = context;
-        // 获取蓝牙管理器实例
+        // Get Bluetooth manager instance
         BluetoothManager bluetoothManager = (BluetoothManager) context.getSystemService(Context.BLUETOOTH_SERVICE);
-        // 获取蓝牙适配器实例
+        // Get Bluetooth adapter instance
         BluetoothAdapter bluetoothAdapter = bluetoothManager.getAdapter();
-        // 检查系统版本是否支持蓝牙低功耗广播，并且蓝牙适配器是否可用
+        // Check if system version supports Bluetooth Low Energy advertising and if Bluetooth adapter is available
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP && bluetoothAdapter != null) {
-            // 获取蓝牙低功耗广播器实例
+            // Get Bluetooth Low Energy advertiser instance
             bluetoothLeAdvertiser = bluetoothAdapter.getBluetoothLeAdvertiser();
         }
         this.advertiseSettings = new AdvertiseSettings.Builder()
@@ -82,7 +82,7 @@ public class BluetoothAdvertiser {
     }
 
     /**
-     * 启动蓝牙低功耗广播。
+     * Starts Bluetooth Low Energy advertising.
      */
     @TargetApi(Build.VERSION_CODES.LOLLIPOP)
     public void startAdvertising() {
@@ -101,7 +101,7 @@ public class BluetoothAdvertiser {
     }
 
     /**
-     * 停止蓝牙低功耗广播。
+     * Stops Bluetooth Low Energy advertising.
      */
     @TargetApi(Build.VERSION_CODES.LOLLIPOP)
     public void stopAdvertising() {
@@ -115,9 +115,9 @@ public class BluetoothAdvertiser {
     }
 
     /**
-     * 检查当前是否在广播状态
+     * Checks if currently advertising
      * 
-     * @return true表示正在广播，false表示未广播
+     * @return true if advertising, false otherwise
      */
     @TargetApi(Build.VERSION_CODES.LOLLIPOP)
     public boolean isAdvertising() {
@@ -125,9 +125,9 @@ public class BluetoothAdvertiser {
     }
 
     /**
-     * 设置蓝牙低功耗广播数据并重新启动广播。
+     * Sets Bluetooth Low Energy advertising data and restarts advertising.
      * 
-     * @param data 要设置的广播数据
+     * @param data The advertising data to set
      */
     @TargetApi(Build.VERSION_CODES.LOLLIPOP)
     public void setAdvertisingData(byte[] data) {
@@ -141,20 +141,20 @@ public class BluetoothAdvertiser {
             return;
         }
 
-        // 仅设置厂商数据，不包含其他信息
+        // Only set manufacturer data, no other information included
         this.advertiseData = new AdvertiseData.Builder()
                 .setIncludeDeviceName(false)
                 .setIncludeTxPowerLevel(false)
                 .addManufacturerData(
-                        ((data[0] & 0xFF) << 8) | (data[1] & 0xFF), // 前两个字节作为厂商ID
-                        Arrays.copyOfRange(data, 2, data.length) // 剩余字节作为数据
+                        ((data[0] & 0xFF) << 8) | (data[1] & 0xFF), // First two bytes as manufacturer ID
+                        Arrays.copyOfRange(data, 2, data.length) // Remaining bytes as data
                 )
                 .build();
 
-        // 停止当前广播
+        // Stop current advertising
         stopAdvertising();
 
-        // 启动新广播
+        // Restart advertising with new data
         if (this.advertiseData != null) {
             bluetoothLeAdvertiser.startAdvertising(advertiseSettings, this.advertiseData, advertiseCallback);
         }
