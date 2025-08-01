@@ -34,12 +34,12 @@ import java.util.HashMap;
 
 public class ProtoMaker {
 
-    private  final UUID CCCD_UUID = UUID.fromString("000002902-0000-1000-8000-00805f9b34fb");
+    private final UUID CCCD_UUID = UUID.fromString("000002902-0000-1000-8000-00805f9b34fb");
 
     static Protos.ScanResult from(BluetoothDevice device, byte[] advertisementData, int rssi) {
         Protos.ScanResult.Builder p = Protos.ScanResult.newBuilder();
         p.setDevice(from(device));
-        if(advertisementData != null && advertisementData.length > 0)
+        if (advertisementData != null && advertisementData.length > 0)
             p.setAdvertisementData(AdvertisementParser.parse(advertisementData));
         p.setRssi(rssi);
         return p.build();
@@ -51,53 +51,60 @@ public class ProtoMaker {
         p.setDevice(from(device));
         Protos.AdvertisementData.Builder a = Protos.AdvertisementData.newBuilder();
         ScanRecord scanRecord = scanResult.getScanRecord();
-        if(Build.VERSION.SDK_INT >= 26) {
+        if (Build.VERSION.SDK_INT >= 26) {
             a.setConnectable(scanResult.isConnectable());
         } else {
-            if(scanRecord != null) {
+            if (scanRecord != null) {
                 int flags = scanRecord.getAdvertiseFlags();
                 a.setConnectable((flags & 0x2) > 0);
             }
         }
-        if(scanRecord != null) {
+        if (scanRecord != null) {
             String deviceName = scanRecord.getDeviceName();
-            if(deviceName != null) {
+            if (deviceName != null) {
                 // Log.d("FlutterBlue", "Device name: " + deviceName);
                 a.setLocalName(deviceName);
             }
             int txPower = scanRecord.getTxPowerLevel();
-            if(txPower != Integer.MIN_VALUE) {
+            if (txPower != Integer.MIN_VALUE) {
                 // Log.d("FlutterBlue", "Tx power: " + txPower);
                 a.setTxPowerLevel(Protos.Int32Value.newBuilder().setValue(txPower));
             }
             // Manufacturer Specific Data
             SparseArray<byte[]> msd = scanRecord.getManufacturerSpecificData();
-            if(msd != null) {
-                for (int i = 0; i < msd.size(); i++) {
-                    try {
-                        int key = msd.keyAt(i);
-                        byte[] value = msd.valueAt(i);
-                       // Log.d("FlutterBlue", "Adding manufacturer data: " + key + ", length: " + (value != null ? value.length : "null"));
-                        if (value != null) {
-                            a.putManufacturerData(key, ByteString.copyFrom(value));
+            if (msd != null) {
+                try {
+                    int size = msd.size();
+                    for (int i = 0; i < size; i++) {
+                        try {
+                            int key = msd.keyAt(i);
+                            byte[] value = msd.valueAt(i);
+                            // Log.d("FlutterBlue", "Adding manufacturer data: " + key + ", length: " +
+                            // (value != null ? value.length : "null"));
+                            if (value != null) {
+                                a.putManufacturerData(key, ByteString.copyFrom(value));
+                            }
+                        } catch (Exception e) {
+                            Log.e("FlutterBlue", "Error adding manufacturer data1", e);
                         }
-                    } catch (Exception e) {
-                        // Log.e("FlutterBlue", "Error adding manufacturer data", e);
                     }
+                } catch (Exception e) {
+                    Log.e("FlutterBlue", "Error iterating manufacturer data2", e);
                 }
             }
-            
+
             // Service Data
             Map<ParcelUuid, byte[]> serviceData = scanRecord.getServiceData();
-            if(serviceData != null) {
+            if (serviceData != null) {
                 // Log.d("FlutterBlue", "Service data size: " + serviceData.size());
                 for (Map.Entry<ParcelUuid, byte[]> entry : serviceData.entrySet()) {
                     try {
                         ParcelUuid key = entry.getKey();
                         byte[] value = entry.getValue();
-                        if(key != null && value != null) {
+                        if (key != null && value != null) {
                             String uuidString = key.getUuid().toString();
-                            // Log.d("FlutterBlue", "Adding service data for UUID: " + uuidString + ", length: " + value.length);
+                            // Log.d("FlutterBlue", "Adding service data for UUID: " + uuidString + ",
+                            // length: " + value.length);
                             a.putServiceData(uuidString, ByteString.copyFrom(value));
                         } else {
                             // Log.w("FlutterBlue", "Service data entry has null key or value");
@@ -107,14 +114,14 @@ public class ProtoMaker {
                     }
                 }
             }
-            
+
             // Service UUIDs
             List<ParcelUuid> serviceUuids = scanRecord.getServiceUuids();
-            if(serviceUuids != null) {
+            if (serviceUuids != null) {
                 // Log.d("FlutterBlue", "Service UUIDs size: " + serviceUuids.size());
                 for (ParcelUuid s : serviceUuids) {
                     try {
-                        if(s != null) {
+                        if (s != null) {
                             String uuidString = s.getUuid().toString();
                             // Log.d("FlutterBlue", "Adding service UUID: " + uuidString);
                             a.addServiceUuids(uuidString);
@@ -129,33 +136,34 @@ public class ProtoMaker {
         } else {
             // Log.d("FlutterBlue", "Scan record is null");
         }
-        
+
         // Log.d("FlutterBlue", "Building advertisement data...");
         // // 打印当前 AdvertisementData.Builder 的状态
         // Log.d("FlutterBlue", "Advertisement data state before build:");
-        // Log.d("FlutterBlue", "  - Manufacturer data size: " + a.getManufacturerDataCount());
-        // Log.d("FlutterBlue", "  - Service data size: " + a.getServiceDataCount());
-        // Log.d("FlutterBlue", "  - Service UUIDs size: " + a.getServiceUuidsCount());
-        
+        // Log.d("FlutterBlue", " - Manufacturer data size: " +
+        // a.getManufacturerDataCount());
+        // Log.d("FlutterBlue", " - Service data size: " + a.getServiceDataCount());
+        // Log.d("FlutterBlue", " - Service UUIDs size: " + a.getServiceUuidsCount());
+
         try {
             // Log.d("FlutterBlue", "Building advertisement data...");
-            
+
             // 创建一个新的 builder
             Protos.AdvertisementData.Builder newBuilder = Protos.AdvertisementData.newBuilder();
-            
+
             // 复制基本字段
             String localName = a.getLocalName();
             if (localName != null && !localName.isEmpty()) {
                 newBuilder.setLocalName(localName);
             }
-            
+
             Protos.Int32Value txPowerLevel = a.getTxPowerLevel();
             if (txPowerLevel != null) {
                 newBuilder.setTxPowerLevel(txPowerLevel);
             }
-            
+
             newBuilder.setConnectable(a.getConnectable());
-            
+
             // 清理并复制 manufacturer data
             Map<Integer, ByteString> manufacturerData = new HashMap<>();
             for (Map.Entry<Integer, ByteString> entry : a.getManufacturerDataMap().entrySet()) {
@@ -167,7 +175,7 @@ public class ProtoMaker {
                     // Log.e("FlutterBlue", "Error processing manufacturer data entry", e);
                 }
             }
-            
+
             // 清理并复制 service data
             Map<String, ByteString> serviceData = new HashMap<>();
             for (Map.Entry<String, ByteString> entry : a.getServiceDataMap().entrySet()) {
@@ -179,7 +187,7 @@ public class ProtoMaker {
                     // Log.e("FlutterBlue", "Error processing service data entry", e);
                 }
             }
-            
+
             // 清理并复制 service UUIDs
             List<String> serviceUuids = new ArrayList<>();
             for (String uuid : a.getServiceUuidsList()) {
@@ -191,30 +199,30 @@ public class ProtoMaker {
                     // Log.e("FlutterBlue", "Error processing service UUID", e);
                 }
             }
-            
+
             // 添加清理后的数据
             for (Map.Entry<Integer, ByteString> entry : manufacturerData.entrySet()) {
                 newBuilder.putManufacturerData(entry.getKey(), entry.getValue());
             }
-            
+
             for (Map.Entry<String, ByteString> entry : serviceData.entrySet()) {
                 newBuilder.putServiceData(entry.getKey(), entry.getValue());
             }
-            
+
             for (String uuid : serviceUuids) {
                 newBuilder.addServiceUuids(uuid);
             }
-            
+
             Protos.AdvertisementData advertisementData = newBuilder.build();
             // Log.d("FlutterBlue", "Built advertisement data");
-            
+
             // Log.d("FlutterBlue", "Setting advertisement data...");
             p.setAdvertisementData(advertisementData);
             // Log.d("FlutterBlue", "Set advertisement data");
 
-            //2025-6-30 修改 rssi=0 bug 导致android 手机无法限制距离
+            // 2025-6-30 修改 rssi=0 bug 导致android 手机无法限制距离
             p.setRssi(scanResult.getRssi());
-            
+
             // Log.d("FlutterBlue", "Building final result...");
             Protos.ScanResult result = p.build();
             // Log.d("FlutterBlue", "Built final result");
@@ -235,10 +243,10 @@ public class ProtoMaker {
         Protos.BluetoothDevice.Builder p = Protos.BluetoothDevice.newBuilder();
         p.setRemoteId(device.getAddress());
         String name = device.getName();
-        if(name != null) {
+        if (name != null) {
             p.setName(name);
         }
-        switch(device.getType()){
+        switch (device.getType()) {
             case BluetoothDevice.DEVICE_TYPE_LE:
                 p.setType(Protos.BluetoothDevice.Type.LE);
                 break;
@@ -260,32 +268,33 @@ public class ProtoMaker {
         p.setRemoteId(device.getAddress());
         p.setUuid(service.getUuid().toString());
         p.setIsPrimary(service.getType() == BluetoothGattService.SERVICE_TYPE_PRIMARY);
-        for(BluetoothGattCharacteristic c : service.getCharacteristics()) {
+        for (BluetoothGattCharacteristic c : service.getCharacteristics()) {
             p.addCharacteristics(from(device, c, gatt));
         }
-        for(BluetoothGattService s : service.getIncludedServices()) {
+        for (BluetoothGattService s : service.getIncludedServices()) {
             p.addIncludedServices(from(device, s, gatt));
         }
         return p.build();
     }
 
-    static Protos.BluetoothCharacteristic from(BluetoothDevice device, BluetoothGattCharacteristic characteristic, BluetoothGatt gatt) {
+    static Protos.BluetoothCharacteristic from(BluetoothDevice device, BluetoothGattCharacteristic characteristic,
+            BluetoothGatt gatt) {
         Protos.BluetoothCharacteristic.Builder p = Protos.BluetoothCharacteristic.newBuilder();
         p.setRemoteId(device.getAddress());
         p.setUuid(characteristic.getUuid().toString());
         p.setProperties(from(characteristic.getProperties()));
-        if(characteristic.getValue() != null)
+        if (characteristic.getValue() != null)
             p.setValue(ByteString.copyFrom(characteristic.getValue()));
-        for(BluetoothGattDescriptor d : characteristic.getDescriptors()) {
+        for (BluetoothGattDescriptor d : characteristic.getDescriptors()) {
             p.addDescriptors(from(device, d));
         }
-        if(characteristic.getService().getType() == BluetoothGattService.SERVICE_TYPE_PRIMARY) {
+        if (characteristic.getService().getType() == BluetoothGattService.SERVICE_TYPE_PRIMARY) {
             p.setServiceUuid(characteristic.getService().getUuid().toString());
         } else {
             // Reverse search to find service
-            for(BluetoothGattService s : gatt.getServices()) {
-                for(BluetoothGattService ss : s.getIncludedServices()) {
-                    if(ss.getUuid().equals(characteristic.getService().getUuid())){
+            for (BluetoothGattService s : gatt.getServices()) {
+                for (BluetoothGattService ss : s.getIncludedServices()) {
+                    if (ss.getUuid().equals(characteristic.getService().getUuid())) {
                         p.setServiceUuid(s.getUuid().toString());
                         p.setSecondaryServiceUuid(ss.getUuid().toString());
                         break;
@@ -302,7 +311,7 @@ public class ProtoMaker {
         p.setUuid(descriptor.getUuid().toString());
         p.setCharacteristicUuid(descriptor.getCharacteristic().getUuid().toString());
         p.setServiceUuid(descriptor.getCharacteristic().getService().getUuid().toString());
-        if(descriptor.getValue() != null)
+        if (descriptor.getValue() != null)
             p.setValue(ByteString.copyFrom(descriptor.getValue()));
         return p.build();
     }
@@ -324,7 +333,7 @@ public class ProtoMaker {
 
     static Protos.DeviceStateResponse from(BluetoothDevice device, int state) {
         Protos.DeviceStateResponse.Builder p = Protos.DeviceStateResponse.newBuilder();
-        switch(state) {
+        switch (state) {
             case BluetoothProfile.STATE_DISCONNECTING:
                 p.setState(Protos.DeviceStateResponse.BluetoothDeviceState.DISCONNECTING);
                 break;
